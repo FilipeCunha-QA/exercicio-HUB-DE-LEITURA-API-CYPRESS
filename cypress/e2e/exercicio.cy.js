@@ -118,23 +118,23 @@ describe('Testes da Funcionalidade Catálogo de Livros', () => {
           })
      });
 
-     it.only('DELETE - Deve excluir um livro previamente', () => {
-    let tituloLivro = `Livro de QA nº${Date.now()}`;
+     it('DELETE - Deve excluir um livro previamente', () => {
+          let tituloLivro = `Livro de QA nº${Date.now()}`;
 
-    // Chama o comando customizado para criar o livro e recuperar o ID
-    cy.cadastrarLivro(tituloLivro, "Engenheiro de QA", "Geral", 3, token).then(bookId => {
-        
-        // Executa a exclusão usando o ID retornado pelo command
-        cy.api({
-            method: 'DELETE',
-            url: `books/${bookId}`,
-            headers: { 'Authorization': token }
-        }).should(response => {
-            expect(response.status).to.equal(200);
-            expect(response.body.message).to.equal('Livro deletado com sucesso.');
-        });
-    });
-});
+          // Chama o comando customizado para criar o livro e recuperar o ID
+          cy.cadastrarLivro(tituloLivro, "Engenheiro de QA", "Geral", 3, token).then(bookId => {
 
-     
+               // Executa a exclusão usando o ID retornado pelo command
+               cy.api({
+                    method: 'DELETE',
+                    url: `books/${bookId}`,
+                    headers: { 'Authorization': token }
+               }).should(response => {
+                    expect(response.status).to.equal(200);
+                    expect(response.body.message).to.equal('Livro deletado com sucesso.');
+               });
+          });
+     });
+
+
 });
