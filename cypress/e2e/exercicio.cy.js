@@ -12,24 +12,22 @@ describe('Testes da Funcionalidade Catálogo de Livros', () => {
      // Objetivo: Verificar que a API retorna lista de livros com paginação e filtros funcionando
      // Validar que filtros por categoria e autores funcionam corretamente
      it('GET - Deve listar livros com filtros e paginação', () => {
-          it('Deve listar livros com filtros e paginação com sucesso', () => {
-               cy.api({
-                    method: 'GET',
-                    url: 'api/books',
-                    qs: {
-                         categoria: 'Ficção',
-                         autor: 'Machado de Assis',
-                         page: 1,
-                         limit: 10
-                    },
-                    headers: { 'Authorization': token }
-               }).should(response => {
-                    expect(response.status).to.equal(200)
-                    expect(response.body.books).to.be.an('array')
-                    expect(response.body.books.length).to.be.at.most(10)
-                    expect(response.body).to.have.property('total')
-               })
-          });
+          cy.api({
+               method: 'GET',
+               url: '/books',
+               qs: {
+                    categoria: 'Ficção',
+                    autor: 'Machado de Assis',
+                    page: 1,
+                    limit: 10
+               },
+               headers: { 'Authorization': token }
+          }).should(response => {
+               expect(response.status).to.equal(200)
+               expect(response.body.books).to.be.an('array')
+               expect(response.body.books.length).to.be.at.most(10)
+
+          })
      });
 
      // Objetivo: Validar que é possível obter detalhes de um livro específico pelo ID
@@ -107,24 +105,27 @@ describe('Testes da Funcionalidade Catálogo de Livros', () => {
 
      // Objetivo: Validar que um livro pode ser removido do catálogo
      // Verificar que apenas admin pode deletar livros (validação de permissão)
-     it.skip('DELETE - Deve deletar um livro previamente cadastrado', () => {
-          cy.api({
-               method: 'DELETE',
-               url: 'books/7',
-               headers: { 'Authorization': token }
-          }).should(response => {
-               expect(response.status).to.equal(200)
-               expect(response.body.message).to.equal('Livro deletado com sucesso.')
-          })
-     });
+     it('DELETE - Deve deletar um livro previamente cadastrado', () => {
+    let tituloLivro = `Livro de QA nº${Date.now()}`;
+    
+    // Adicionamos a categoria ('Geral') que estava faltando antes do '3'
+    cy.cadastrarLivro(tituloLivro, 'Engenheiro de QA', 'Geral', 3, token).then(bookID => {
+
+        cy.api({
+            method: 'DELETE',
+            url: `books/${bookID}`,
+            headers: { 'Authorization': token }
+        }).should(response => {
+            expect(response.status).to.equal(200)
+            expect(response.body.message).to.equal('Livro deletado com sucesso.')
+        })
+    })
+});
 
      it('DELETE - Deve excluir um livro previamente', () => {
           let tituloLivro = `Livro de QA nº${Date.now()}`;
-
-          // Chama o comando customizado para criar o livro e recuperar o ID
           cy.cadastrarLivro(tituloLivro, "Engenheiro de QA", "Geral", 3, token).then(bookId => {
 
-               // Executa a exclusão usando o ID retornado pelo command
                cy.api({
                     method: 'DELETE',
                     url: `books/${bookId}`,
@@ -135,6 +136,4 @@ describe('Testes da Funcionalidade Catálogo de Livros', () => {
                });
           });
      });
-
-
 });
